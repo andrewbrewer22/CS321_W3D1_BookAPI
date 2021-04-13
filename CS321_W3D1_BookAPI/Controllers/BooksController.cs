@@ -1,6 +1,7 @@
 ﻿using CS321_W3D1_BookAPI.Models;
 using CS321_W3D1_BookAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace CS321_W3D1_BookAPI.Controllers
 {
@@ -11,16 +12,31 @@ namespace CS321_W3D1_BookAPI.Controllers
         private readonly IBookService _bookService;
 
         // Constructor
-        public BooksController(/* TODO: inject IBookService */)
+        public BooksController(IBookService bookService)
         {
-            // TODO: keep a reference to the service so we can use below
+            _bookService = bookService;
         }
 
         // TODO: get all books
         // GET api/books
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok(_bookService.GetAll());
+        }
 
         // get specific book by id
         // GET api/books/:id
+        [HttpGet("{id}")]
+        public IActionResult Get(int id)
+        {
+            var book = _bookService.Get(id);
+
+            if (book == null)
+                return NotFound();
+
+            return Ok(book);
+        }
 
         // create a new book
         // POST api/books
@@ -46,7 +62,36 @@ namespace CS321_W3D1_BookAPI.Controllers
         // TODO: update an existing book
         // PUT api/books/:id
 
+        [HttpPut]
+        public IActionResult Put([FromBody]Book updatedBook)
+        {
+            //return Ok(_bookService.Update(updatedBook));
+
+            try
+            {
+                return Ok(_bookService.Update(updatedBook));
+
+            }
+            catch(Exception ex)
+            {
+                ModelState.AddModelError("UpdateBook", ex.Message);
+                return BadRequest(ModelState);
+            }
+        }
+
         // TODO: delete an existing book
         // DELETE api/books/:id
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var book = _bookService.Get(id);
+
+            if (book == null)
+                return NotFound();
+
+            _bookService.Remove(book);
+            return NoContent();
+        }
     }
 }
