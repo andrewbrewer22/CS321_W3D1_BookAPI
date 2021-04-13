@@ -70,7 +70,6 @@ namespace CS321_W3D1_BookAPI.Controllers
             try
             {
                 return Ok(_bookService.Update(updatedBook));
-
             }
             catch(Exception ex)
             {
